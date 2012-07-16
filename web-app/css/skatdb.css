@@ -1,0 +1,47 @@
+body {
+	max-width: 1112px;
+}
+
+#skatdbLogo {
+	background-color: #abbf78;
+}
+
+#skatdbLogo a {
+	display: inline-block;
+	margin: 1em;
+}
+
+.filter {
+	padding-bottom: 12px;
+}
+
+.points {
+	padding-top: 4px;
+	margin-top: 12px;
+	border-top: 1px solid #CCCCCC;
+	font-size: 110%;
+	text-align: center;
+}
+.gameValue {
+	
+}
+.won {
+	color: green;
+}
+.lost {
+	color: red;
+}
+
+.nav a.statistics, .nav a.import {
+	background-position: 0.7em center;
+	background-repeat: no-repeat;
+	text-indent: 25px;
+}
+
+.nav a.statistics {
+	background-image: url(../images/skin/statistics.png);
+}
+
+.nav a.import {
+	background-image: url(../images/skin/database_import.png);
+}
