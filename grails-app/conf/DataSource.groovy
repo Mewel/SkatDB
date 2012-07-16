@@ -24,39 +24,20 @@ environments {
         }
     }
     production {
-        dataSource {
-			dialect = "org.hibernate.dialect.MySQL5InnoDBDialect"
-            dbCreate = "update"
-            url = "jdbc:mysql://localhost/skatdb?useUnicode=yes&characterEncoding=UTF-8"
-			driverClassName = "com.mysql.jdbc.Driver"
-			username = "skatdb"
-			password = "alleswirdgut"
-            pooled = true
-            properties {
-               maxActive = -1
-               minEvictableIdleTimeMillis=1800000
-               timeBetweenEvictionRunsMillis=1800000
-               numTestsPerEvictionRun=3
-               testOnBorrow=true
-               testWhileIdle=true
-               testOnReturn=true
-               validationQuery="SELECT 1"
-            }
-        }
-//		dataSource {
-//			dbCreate = "update"
-//			url = "jdbc:h2:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
-//			pooled = true
-//			properties {
-//			   maxActive = -1
-//			   minEvictableIdleTimeMillis=1800000
-//			   timeBetweenEvictionRunsMillis=1800000
-//			   numTestsPerEvictionRun=3
-//			   testOnBorrow=true
-//			   testWhileIdle=true
-//			   testOnReturn=true
-//			   validationQuery="SELECT 1"
-//			}
-//		}
+		dataSource {
+			dbCreate = "update"
+			url = "jdbc:h2:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
+			pooled = true
+			properties {
+			   maxActive = -1
+			   minEvictableIdleTimeMillis=1800000
+			   timeBetweenEvictionRunsMillis=1800000
+			   numTestsPerEvictionRun=3
+			   testOnBorrow=true
+			   testWhileIdle=true
+			   testOnReturn=true
+			   validationQuery="SELECT 1"
+			}
+		}
     }
 }
