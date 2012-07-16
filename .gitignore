@@ -1,0 +1,8 @@
+/.settings
+/.classpath
+/.project
+/devDb.h2.db
+/devDb.lock.db
+/devDb.trace.db
+/SkatDB.war
+/target
