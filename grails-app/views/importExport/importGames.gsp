@@ -12,7 +12,7 @@
 		<div class="nav" role="navigation">
 			<ul>
 				<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-				<li><g:link class="export" action="exportJSON"><g:message code="export.label" /></g:link></li>
+				<li><g:link class="export" controller="JSON" action="games"><g:message code="export.label" /></g:link></li>
 			</ul>
 		</div>
 		<div id="import-game" class="content scaffold-import" role="main">

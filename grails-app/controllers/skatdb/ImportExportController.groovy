@@ -44,27 +44,4 @@ class ImportExportController {
 		}
 	}
 
-	def exportJSON() {
-		List<Game> results = Game.all
-		render(contentType: "text/json") {
-		    array {
-		        for (g in results) {
-		            game(
-						group: g.group.name,
-						player: g.player.name,
-						bid: g.bid,
-						jacks: g.jacks,
-						gameType: g.gameType,
-						hand: g.hand,
-						gameLevel: g.gameLevel,
-						announcement: g.announcement,
-						won: g.won,
-						createDate: g.createDate.time,
-						modifyDate: g.modifyDate.time
-					)
-		        }
-		    }
-		}
-	}
-
 }
