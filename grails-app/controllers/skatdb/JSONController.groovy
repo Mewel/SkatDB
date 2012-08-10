@@ -50,6 +50,7 @@ class JSONController {
 							gameLevel: g.gameLevel,
 							announcement: g.announcement,
 							won: g.won,
+							value: g.value,
 							createDate: g.createDate.time,
 							modifyDate: g.modifyDate.time
 							)

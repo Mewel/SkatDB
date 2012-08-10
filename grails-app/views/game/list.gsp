@@ -54,21 +54,30 @@
 
 						<td>${fieldValue(bean: gameInstance, field: "player")}</td>
 
-						<td>${fieldValue(bean: gameInstance, field: "bid")}</td>
+						<td>${!(gameInstance?.bid == 0) ? fieldValue(bean: gameInstance, field: "bid") : ''}</td>
 
-						<td>${!gameInstance?.isNullGame() ? fieldValue(bean: gameInstance, field: "jacks") : ''}</td>
-
-						<td><g:message code="gameType.${gameInstance.gameType}"/></td>
+						<td>${!(gameInstance?.bid == 0 || gameInstance?.isNullGame()) ? fieldValue(bean: gameInstance, field: "jacks") : ''}</td>
 
 						<td>
-							<g:if test="${!gameInstance?.isNullGame()}" >
+							<g:if test="${gameInstance?.bid == 0}">
+							<g:message code="gameType.0"/>
+							</g:if>
+							<g:else>
+								<g:message code="gameType.${gameInstance.gameType}"/>
+							</g:else>
+						</td>
+						<td>
+							<g:if test="${gameInstance?.bid == 0}">
+								<g:message code="gameLevel.ramsch.${gameInstance.gameLevel}"/>
+							</g:if>
+							<g:else>
 								<g:if test="${gameInstance?.hand == true}">
-									<g:message code="gameLevelHand.${gameInstance.gameLevel}"/>
+									<g:message code="gameLevel.hand.${gameInstance.gameLevel}"/>
 								</g:if>
 								<g:else>
 									<g:message code="gameLevel.${gameInstance.gameLevel}"/>
 								</g:else>
-							</g:if>
+							</g:else>
 						</td>
 
 						<td><g:message code="announcement.${gameInstance.announcement}"/></td>

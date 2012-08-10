@@ -1,9 +1,13 @@
-function calcGameValue(withOrWithout, gameType, gameLevel, announcement, won) {
+function calcGameValue(bid, jacks, gameType, gameLevel, announcement, won) {
 	var value = 0;
+	if(bid == 0) {
+		// ramsch we use the jacks as value
+		return jacks * gameLevel;
+	}
 	if(isNullGame(gameType)) {
 		value = gameType;
 	} else {
-		value = gameType * (withOrWithout + gameLevel);
+		value = gameType * (jacks + gameLevel);
 	}
 	value *= announcement;
 	if(!won) {

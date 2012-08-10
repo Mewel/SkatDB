@@ -16,15 +16,16 @@
 	<g:select id="player" name="player.id" from="${skatdb.Player.list()}" optionKey="id" required="" value="${gameInstance?.player?.id}" class="many-to-one"/>
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: gameInstance, field: 'bid', 'error')} required">
+<div class="fieldcontain ${hasErrors(bean: gameInstance, field: 'bid', 'error')}">
 	<label for="bid">
 		<g:message code="game.bid.label" default="Bid" />
 		<span class="required-indicator">*</span>
 	</label>
-	<g:field type="number" name="bid" required="" value="${gameInstance.bid}"/>
+	<%--<g:field type="number" name="bid" required="" value="${gameInstance.bid}"/> --%>
+	<g:select valueMessagePrefix="bid" name="bid" from="${skatdb.Game.constraints.bid.inList}" value="${gameInstance?.bid}" />
 </div>
 
-<div class="fieldcontain ${hasErrors(bean: gameInstance, field: 'gameType', 'error')} required">
+<div class="fieldcontain ${hasErrors(bean: gameInstance, field: 'gameType', 'error')}">
 	<label for="gameType">
 		<g:message code="game.gameType.label" default="Game Type" />
 		<span class="required-indicator">*</span>
@@ -36,7 +37,7 @@
 	<label for="jacks">
 		<g:message code="game.jacks.label" default="Jacks" />
 	</label>
-	<g:field type="number" name="jacks" required="" value="${gameInstance.jacks}"/>
+	<g:field type="number" name="jacks" required="" value="${gameInstance?.bid == 0 ? -gameInstance.value : gameInstance.jacks}"/>
 </div>
 
 <div class="fieldcontain ${hasErrors(bean: gameInstance, field: 'hand', 'error')}">
@@ -82,14 +83,16 @@
 
 <g:javascript>
 
+  var ramsch = ${gameInstance?.bid} == 0;
   var gameLevel;
   var gameLevelOptions = [];
   var gameLevelHandOptions = [];
+  var gameLevelRamschOptions = [];
 
   $(document).ready(function() {
 	initGSP();
-  	updateEditable();
-  	updateGameLevel();
+  	updateEditable(ramsch);
+  	updateGameLevel(ramsch);
   	$('#gameLevel option[value=${gameInstance?.gameLevel}]').attr("selected", "selected");
   	updatePoints();
 
@@ -97,11 +100,20 @@
       updatePoints();
     });
     $('#gameType').change(function() {
-      updateEditable();
+      updateEditable(ramsch);
+      updatePoints();
+    });
+    $('#bid').change(function() {
+      var bid = parseInt($('#bid').val());
+      if(bid == 0) {
+      	setRamsch(true);
+      } else if(ramsch) {
+      	setRamsch(false);
+      }
       updatePoints();
     });
     $('#hand').change(function() {
-      updateGameLevel();
+      updateGameLevel(ramsch);
       updatePoints();
     });
   });
@@ -116,20 +128,25 @@
 
     <g:set var="i" value="${2}"/>
     <g:while test="${i <= 7}">
-      gameLevelHandOptions.push({value: ${i}, i18n: "<g:message code="gameLevelHand.$i" />"});
+      gameLevelHandOptions.push({value: ${i}, i18n: "<g:message code="gameLevel.hand.$i" />"});
       <%i++ %>
     </g:while>
+
+    gameLevelRamschOptions.push({value: -1, i18n: "<g:message code="gameLevel.ramsch.-1" />"});
+    gameLevelRamschOptions.push({value: -2, i18n: "<g:message code="gameLevel.ramsch.-2" />"});
+    gameLevelRamschOptions.push({value: 2, i18n: "<g:message code="gameLevel.ramsch.2" />"});
   }
 
   function updatePoints() {
-    var withOrWithout = parseInt($('#jacks').val());
+  	var bid = parseInt($('#bid').val());
+    var jacks = parseInt($('#jacks').val());
    	var gameType = parseInt($('#gameType').val());
    	var hand = $('#hand:checked').val() == "on";
    	var gameLevel = parseInt($('#gameLevel').val());
    	var announcement = parseInt($('#announcement').val());
    	var won = $('#won:checked').val() == "on";
 
-	var gameValue = calcGameValue(withOrWithout, gameType, gameLevel, announcement, won);
+	var gameValue = calcGameValue(bid, jacks, gameType, gameLevel, announcement, won);
 	$("#gameValue").html(gameValue);
 	if(gameValue > 0) {
 		$("#gameValue").addClass("won").removeClass("lost");
@@ -138,27 +155,45 @@
 	}
   }
 
-  function updateEditable() {
-  	var gameType = parseInt($('#gameType').val());
-    if(isNullGame(gameType)) {
- 	  $('#jacks').attr("disabled", "disabled");
+  function setRamsch(/*boolean*/ r) {
+  	updateEditable(r);
+  	updateGameLevel(r);
+  	ramsch = r;
+  }
+
+  function updateEditable(ramsch) {
+    if(ramsch) {
+      $('#gameType').attr("disabled", "disabled");
       $('#hand').attr("disabled", "disabled");
-      $('#gameLevel').attr("disabled", "disabled");
- 	} else {
- 	  $('#jacks').removeAttr("disabled");
- 	  $('#hand').removeAttr("disabled");
-      $('#gameLevel').removeAttr("disabled");
+      $('#announcement').attr("disabled", "disabled");
+      $('#won').attr("disabled", "disabled");
+    } else {
+      $('#gameType').removeAttr("disabled");
+      $('#hand').removeAttr("disabled");
+      $('#announcement').removeAttr("disabled");
+      $('#won').removeAttr("disabled");
+      var gameType = parseInt($('#gameType').val());
+      if(isNullGame(gameType)) {
+ 	    $('#jacks').attr("disabled", "disabled");
+        $('#hand').attr("disabled", "disabled");
+        $('#gameLevel').attr("disabled", "disabled");
+ 	  } else {
+        $('#jacks').removeAttr("disabled");
+ 	    $('#hand').removeAttr("disabled");
+        $('#gameLevel').removeAttr("disabled");
+ 	  }
  	}
   }
 
-  function updateGameLevel() {
+  function updateGameLevel(ramsch) {
     var hand = $('#hand:checked').val() == "on";
     var gameLevelSelect = $('#gameLevel');
     gameLevelSelect.empty();
-    var addOptions = hand ? gameLevelHandOptions : gameLevelOptions;
+    var addOptions = ramsch ? gameLevelRamschOptions : hand ? gameLevelHandOptions : gameLevelOptions;
     for(var i = 0; i < addOptions.length; i++) {
     	var option = addOptions[i];
     	gameLevelSelect.append('<option value="' + option.value +'">' + option.i18n + '</option>');
     }
   }
+
 </g:javascript>

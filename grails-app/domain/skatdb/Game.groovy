@@ -5,7 +5,10 @@ class Game {
 	SkatGroup group
 	Player player
 
-	int bid= 18
+	/**
+	 * bid of 0 = ramsch
+	 */
+	int bid = 18
 
 	int jacks = 1
 
@@ -25,13 +28,23 @@ class Game {
 	boolean hand = false
 
 	/**
+	 * (default game)
 	 * game(1)
-	 * schneider(2) | hand (2)
-	 * schwarz(3) | hand schneider (3)
+	 * schneider(2)
+	 * schwarz(3)
+	 * --------------
+	 * (hand)
+	 * game(2)
+	 * schneider (3)
 	 * schneider_announced(4),
 	 * schwarz(5),
 	 * schwarz_announced(6),
 	 * ouvert(7)
+	 * --------------
+	 * (ramsch)
+	 * game(-1)
+	 * jungfer(-2)
+	 * durchmarsch(2)
 	 */
 	int gameLevel = 1
 
@@ -51,18 +64,21 @@ class Game {
 
 	Date modifyDate = new Date()
 
-    static constraints = {
+	static constraints = {
 		group()
 		player()
-		bid()
+		bid(inList: [0, 18,	20, 22,	23,	24,	27,	30,	33,	35,	36,	40,	44,	45,	46,	48,	50,	54,	55,	59,	60,	63,	66,
+				70,	72,	77,	80,	81,	84,	88,	90,	96,	99,	100, 108, 110, 117, 120, 121, 126, 130, 132, 135,
+				140, 143, 144, 150, 153, 154, 156, 160, 162, 165, 168, 170, 176, 180, 187, 192, 198, 204,
+				216, 240, 264])
 		jacks()
 		hand()
 		gameType(inList: [9, 10, 11, 12, 24, 23, 35, 46, 59])
-		gameLevel(inList: [1, 2, 3, 4, 5, 6, 7])
+		gameLevel(inList: [-2, -1, 1, 2, 3, 4, 5, 6, 7])
 		announcement(inList: [1, 2, 4, 8])
 		won()
 		value()
-    }
+	}
 
 	def beforeInsert() {
 		value = calcValue()
@@ -74,17 +90,26 @@ class Game {
 	}
 
 	int calcValue() {
-		int value = 0
-		if(isNullGame()) {
-			value = gameType
+		int newValue = 0
+		// ramsch -> we use the jacks as value
+		if(bid == 0) {
+			// new game
+			newValue = jacks * gameLevel;
+			won = gameLevel > 0;
+			jacks = 1;
 		} else {
-			value = gameType * (jacks + gameLevel)
+			// normal game
+			if(isNullGame()) {
+				newValue = gameType
+			} else {
+				newValue = gameType * (jacks + gameLevel)
+			}
+			newValue *= announcement;
+			if(!won) {
+				newValue = newValue * -2;
+			}
 		}
-		value *= announcement;
-		if(!won) {
-			value = value * -2;
-		}
-		return value;
+		return newValue;
 	}
 
 	boolean isNullGame() {
@@ -93,19 +118,18 @@ class Game {
 
 	String toString () {
 		return "["+
-			"group: " + group.name +
-			", player: " + player.name +
-			", bid: " + bid + 
-			", jacks: " + jacks +
-			", gameType: " + gameType +
-			", hand: " + hand +
-			", gameLevel: " + gameLevel +
-			", announcement: " + announcement +
-			", won: " + won +
-			", value: " + value +
-			", createDate: " + createDate +
-			", modifyDate: " + modifyDate
+		"group: " + group.name +
+		", player: " + player.name +
+		", bid: " + bid +
+		", jacks: " + jacks +
+		", gameType: " + gameType +
+		", hand: " + hand +
+		", gameLevel: " + gameLevel +
+		", announcement: " + announcement +
+		", won: " + won +
+		", value: " + value +
+		", createDate: " + createDate +
+		", modifyDate: " + modifyDate
 		+"]"
 	}
-
 }

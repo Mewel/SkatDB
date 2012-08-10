@@ -125,15 +125,16 @@ abstract class ImportUtils {
 				Game game = new Game()
 				game.group = findOrCreateGroup(jsonGame.group)
 				game.player = findOrCreatePlayer(jsonGame.player)
-				game.bid = jsonGame.bid
-				game.jacks = jsonGame.jacks
-				game.gameType = jsonGame.gameType
-				game.hand = jsonGame.hand
-				game.gameLevel = jsonGame.gameLevel
-				game.announcement = jsonGame.announcement
-				game.won = jsonGame.won
-				game.createDate = new Date(jsonGame.createDate)
-				game.modifyDate = new Date(jsonGame.modifyDate)
+				game.bid = jsonGame.bid  != null ? jsonGame.bid : 18
+				game.gameType = jsonGame.gameType != null ? jsonGame.gameType : 9
+				game.hand = jsonGame.hand != null ? jsonGame.hand : false
+				game.gameLevel = jsonGame.gameLevel != null ? jsonGame.gameLevel : 1
+				// ramsch uses jacks as value
+				game.jacks =  jsonGame.bid == null || jsonGame.bid != 0 ? (jsonGame.jacks != null ? jsonGame.jacks : 1) : (jsonGame.value  / jsonGame.gameLevel)
+				game.announcement = jsonGame.announcement != null ? jsonGame.announcement : 1
+				game.won = jsonGame.won != null ? jsonGame.won : true
+				game.createDate = jsonGame.createDate != null ? new Date(jsonGame.createDate) : new Date()
+				game.modifyDate = jsonGame.modifyDate != null ? new Date(jsonGame.modifyDate) : new Date()
 				game.save()
 			} catch(Exception exc) {
 				Logger.getLogger(this).error("while parsing json object: " + jsonGame, exc)

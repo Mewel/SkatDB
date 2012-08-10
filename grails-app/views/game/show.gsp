@@ -64,9 +64,13 @@
 						<g:message code="game.gameType.label" default="Game Type" />
 					</span>
 					<span class="property-value" aria-labelledby="gameType-label">
-						<g:message code="gameType.${gameInstance.gameType}"/>
+						<g:if test="${gameInstance?.bid == 0}">
+							<g:message code="gameType.0"/>
+						</g:if>
+						<g:else>
+							<g:message code="gameType.${gameInstance.gameType}"/>
+						</g:else>
 					</span>
-					
 				</li>
 				</g:if>
 
@@ -86,11 +90,16 @@
 						<g:message code="game.gameLevel.label" default="Game Level" />
 					</span>
 					<span class="property-value" aria-labelledby="gameLevel-label">
-						<g:if test="${gameInstance?.hand == true}">
-							<g:message code="gameLevelHand.${gameInstance.gameLevel}"/>
+						<g:if test="${gameInstance?.bid == 0}">
+							<g:message code="gameLevel.ramsch.${gameInstance.gameLevel}"/>
 						</g:if>
 						<g:else>
-							<g:message code="gameLevel.${gameInstance.gameLevel}"/>
+							<g:if test="${gameInstance?.hand == true}">
+								<g:message code="gameLevel.hand.${gameInstance.gameLevel}"/>
+							</g:if>
+							<g:else>
+								<g:message code="gameLevel.${gameInstance.gameLevel}"/>
+							</g:else>
 						</g:else>
 					</span>
 				</li>
