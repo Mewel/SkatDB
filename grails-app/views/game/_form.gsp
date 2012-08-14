@@ -34,8 +34,7 @@
 </div>
 
 <div class="fieldcontain ${hasErrors(bean: gameInstance, field: 'jacks', 'error')}">
-	<label for="jacks">
-		<g:message code="game.jacks.label" default="Jacks" />
+	<label for="jacks" id="jacksLabel">
 	</label>
 	<g:field type="number" name="jacks" required="" value="${gameInstance?.bid == 0 ? -gameInstance.value : gameInstance.jacks}"/>
 </div>
@@ -82,6 +81,9 @@
 </div>
 
 <g:javascript>
+
+  var jacksI18n = "<g:message code="game.jacks.label" default="Jacks" />";
+  var ramschI18n = "<g:message code="game.jacks.ramsch.label" default="Points" />";
 
   var ramsch = ${gameInstance?.bid} == 0;
   var gameLevel;

@@ -15,11 +15,16 @@ class JSONController {
 	* @return json with status information
 	*/
 	def players() {
+		response.setHeader("Access-Control-Allow-Origin", "*")
 		if(request.method == 'GET') {
 			List<Player> results = Player.list()
 			render(contentType: "text/json") {
-				for (p in results) {
-					element p.name
+				if(!results.empty) {
+					for (p in results) {
+						element p.name
+					}
+				} else {
+					[]
 				}
 			}
 		} else if(request.method == 'POST') {
@@ -44,9 +49,7 @@ class JSONController {
 				added = addedPlayers;
 			}
 		} else {
-			render(contentType: "text/json") {
-				status = "invalid request method '" + request.method + "'";
-			}
+			render(contentType: "text/json", status: 400, text: 'Invalid Request method ' + request.method)
 		}
 	}
 
@@ -58,11 +61,16 @@ class JSONController {
 	* @return json with status information
 	*/
 	def groups() {
+		response.setHeader("Access-Control-Allow-Origin", "*")
 		if(request.method == 'GET') {
 			List<SkatGroup> results = SkatGroup.list()
 			render(contentType: "text/json") {
-				for (g in results) {
-					element g.name
+				if(!results.empty) {
+					for (g in results) {
+						element g.name
+					}
+				} else {
+					[]
 				}
 			}
 		} else if(request.method == 'POST') {
@@ -87,39 +95,40 @@ class JSONController {
 				added = addedGroups;
 			}
 		} else {
-			render(contentType: "text/json") {
-				status = "invalid request method '" + request.method + "'";
-			}
-		}	
+			render(contentType: "text/json", status: 400, text: 'Invalid Request method ' + request.method)
+		}
 	}
 
 	def games() {
+		response.setHeader("Access-Control-Allow-Origin", "*")
 		if(request.method == 'GET') {
-		List<Game> results = Game.all
+			List<Game> results = Game.all
 			render(contentType: "text/json") {
-				array {
-					for (g in results) {
-						game(
-								group: g.group.name,
-								player: g.player.name,
-								bid: g.bid,
-								jacks: g.jacks,
-								gameType: g.gameType,
-								hand: g.hand,
-								gameLevel: g.gameLevel,
-								announcement: g.announcement,
-								won: g.won,
-								value: g.value,
-								createDate: g.createDate.time,
-								modifyDate: g.modifyDate.time
-								)
+				if(!results.empty) {
+					array {
+						for (g in results) {
+							game(
+									group: g.group.name,
+									player: g.player.name,
+									bid: g.bid,
+									jacks: g.jacks,
+									gameType: g.gameType,
+									hand: g.hand,
+									gameLevel: g.gameLevel,
+									announcement: g.announcement,
+									won: g.won,
+									value: g.value,
+									createDate: g.createDate.time,
+									modifyDate: g.modifyDate.time
+									)
+						}
 					}
-				}
+				} else {[]}
 			}
 		} else if(request.method == 'POST') {
-			def postMsg = request.reader.text;
+			def postMsg = params.get("games")
 			if(!postMsg) {
-				renderNoPostData()
+				render(contentType: "text/json", status: 400, text: 'No "games" parameter defined')
 				return
 			}
 			try {
@@ -133,25 +142,16 @@ class JSONController {
 					return
 				}
 			} catch(Exception exc) {
-				render(contentType: "text/json") {
-					status = "error";
-					msg = "Invalid json data: '" + postMsg + "'";
-					exc = exc;
-				}
+				render(contentType: "text/json", status: 400, text: "Invalid json data: '" + postMsg + "'")
 				return
 			}
 			render(contentType: "text/json") { status = "ok"; msg = "All hands successfully imported"}
 		} else {
-			render(contentType: "text/json") {
-				status = "invalid request method '" + request.method + "'";
-			}
+			render(contentType: "text/json", status: 400, text: 'Invalid Request method ' + request.method)
 		}
 	}
 
 	private void renderNoPostData() {
-		render(contentType: "text/json") {
-			status = "error";
-			msg = "No POST data";
-		}
+		render(contentType: "text/json", status: 400, text: 'No POST data')
 	}
 }

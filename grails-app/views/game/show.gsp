@@ -121,7 +121,7 @@
 						<g:message code="game.createDate.label" default="create Date" />
 					</span>
 					<span class="property-value" aria-labelledby="createDate-label">
-						<g:formatDate date="${gameInstance.createDate}" format="dd.MM.yyyy"  />
+						<g:formatDate date="${gameInstance.createDate}" format="dd.MM.yyyy HH:mm:ss"  />
 					</span>
 				</li>
 				</g:if>
