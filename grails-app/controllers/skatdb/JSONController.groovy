@@ -1,7 +1,9 @@
 package skatdb
 
 import groovy.json.JsonSlurper
+import grails.plugins.springsecurity.Secured
 
+@Secured(['ROLE_ADMIN'])
 class JSONController {
 
 	def index() {
@@ -49,7 +51,7 @@ class JSONController {
 				added = addedPlayers;
 			}
 		} else {
-			render(contentType: "text/json", status: 400, text: 'Invalid Request method ' + request.method)
+			render(contentType: "text/json") { status = 400; msg = 'Invalid Request method ' + request.method}
 		}
 	}
 
@@ -95,7 +97,7 @@ class JSONController {
 				added = addedGroups;
 			}
 		} else {
-			render(contentType: "text/json", status: 400, text: 'Invalid Request method ' + request.method)
+			render(contentType: "text/json") { status = 400; msg = 'Invalid Request method ' + request.method}
 		}
 	}
 
@@ -128,7 +130,7 @@ class JSONController {
 		} else if(request.method == 'POST') {
 			def postMsg = params.get("games")
 			if(!postMsg) {
-				render(contentType: "text/json", status: 400, text: 'No "games" parameter defined')
+				render(contentType: "text/json") { status = 400; msg = 'No "games" parameter defined'}
 				return
 			}
 			try {
@@ -142,16 +144,17 @@ class JSONController {
 					return
 				}
 			} catch(Exception exc) {
-				render(contentType: "text/json", status: 400, text: "Invalid json data: '" + postMsg + "'")
+				log.error("while import", exc)
+				render(contentType: "text/json") { status = 400; msg = "Invalid json data: '" + postMsg + "'"}
 				return
 			}
-			render(contentType: "text/json") { status = "ok"; msg = "All hands successfully imported"}
+			render(contentType: "text/json") { status = 200; msg = "All hands successfully imported"}
 		} else {
-			render(contentType: "text/json", status: 400, text: 'Invalid Request method ' + request.method)
+			render(contentType: "text/json") { status = 400; msg = 'Invalid Request method ' + request.method}
 		}
 	}
 
 	private void renderNoPostData() {
-		render(contentType: "text/json", status: 400, text: 'No POST data')
+		render(contentType: "text/json") { status = 400; msg = 'No POST data'}
 	}
 }

@@ -5,9 +5,23 @@ import groovy.json.JsonSlurper;
 import java.util.ArrayList;
 import java.util.Date;
 
+
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
 
 abstract class ImportUtils {
+
+	def doWithTransaction = { def closure ->
+		Transaction tr = session.beginTransaction()
+		try {
+			closure()
+			tr.commit()
+		} catch(Throwable t) {
+			tr.rollback()
+			throw new HibernateException("Exception while transaction. The transaction is rolled back.", t)
+		}
+	}
 
 	public static ArrayList<String> doTextImport(String groupId, String importString, Date fakeDate) {
 		SkatGroup group = SkatGroup.findById(groupId)
@@ -120,27 +134,30 @@ abstract class ImportUtils {
 		def errorList = []
 		JsonSlurper slurper = new JsonSlurper()
 		def result = slurper.parseText(json)
-		for(Object jsonGame in result) {
-			try {
-				Game game = new Game()
-				game.group = findOrCreateGroup(jsonGame.group)
-				game.player = findOrCreatePlayer(jsonGame.player)
-				game.bid = jsonGame.bid  != null ? jsonGame.bid : 18
-				game.gameType = jsonGame.gameType != null ? jsonGame.gameType : 9
-				game.hand = jsonGame.hand != null ? jsonGame.hand : false
-				game.gameLevel = jsonGame.gameLevel != null ? jsonGame.gameLevel : 1
-				// ramsch uses jacks as value
-				game.jacks =  jsonGame.bid == null || jsonGame.bid != 0 ? (jsonGame.jacks != null ? jsonGame.jacks : 1) : (jsonGame.value  / jsonGame.gameLevel)
-				game.announcement = jsonGame.announcement != null ? jsonGame.announcement : 1
-				game.won = jsonGame.won != null ? jsonGame.won : true
-				game.createDate = jsonGame.createDate != null ? new Date(jsonGame.createDate) : new Date()
-				game.modifyDate = jsonGame.modifyDate != null ? new Date(jsonGame.modifyDate) : new Date()
-				game.save()
-			} catch(Exception exc) {
-				Logger.getLogger(this).error("while parsing json object: " + jsonGame, exc)
-				errorList.push(jsonGame)
+		def closure = {
+			for(Object jsonGame in result) {
+				try {
+					Game game = new Game()
+					game.group = findOrCreateGroup(jsonGame.group)
+					game.player = findOrCreatePlayer(jsonGame.player)
+					game.bid = jsonGame.bid  != null ? jsonGame.bid : 18
+					game.gameType = jsonGame.gameType != null ? jsonGame.gameType : 9
+					game.hand = jsonGame.hand != null ? jsonGame.hand : false
+					game.gameLevel = jsonGame.gameLevel != null ? jsonGame.gameLevel : 1
+					// ramsch uses jacks as value
+					game.jacks =  jsonGame.bid == null || jsonGame.bid != 0 ? (jsonGame.jacks != null ? jsonGame.jacks : 1) : (jsonGame.value  / jsonGame.gameLevel)
+					game.announcement = jsonGame.announcement != null ? jsonGame.announcement : 1
+					game.won = jsonGame.won != null ? jsonGame.won : true
+					game.createDate = jsonGame.createDate != null ? new Date(jsonGame.createDate) : new Date()
+					game.modifyDate = jsonGame.modifyDate != null ? new Date(jsonGame.modifyDate) : new Date()
+					game.save()
+				} catch(Exception exc) {
+					Logger.getLogger(this).error("while parsing json object: " + jsonGame, exc)
+					errorList.push(jsonGame)
+				}
 			}
 		}
+		this.doWithTransaction(closure)
 		return errorList
 	}
 
