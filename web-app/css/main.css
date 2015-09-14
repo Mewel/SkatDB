@@ -589,3 +589,21 @@ a.skip {
 	position: absolute;
 	left: -9999px;
 }
+
+
+.filter{
+	text-align: center;
+}
+
+.filter fieldset {
+	display: inline;
+	margin: 0px;
+}
+
+.filter fieldset label {
+	display: block;
+}
+
+.picker__footer {
+	display: none;
+}
