@@ -2,7 +2,6 @@
 <%@page import="skatdb.SkatGroup"%>
 <%@ page import="skatdb.Game" %>
 <!doctype html>
-<html>
 
 	<head>
 		<meta name="layout" content="main">
@@ -10,8 +9,13 @@
 		<title><g:message code="default.list.label" args="[entityName]" /></title>
 		<g:javascript src="highcharts/highcharts.js" />
 		<g:javascript src="highcharts/modules/exporting.js" />
+        <g:javascript src="pickadate.js-3.5.6/picker.js"/>
+        <g:javascript src="pickadate.js-3.5.6/picker.date.js"/>
+        <g:javascript src="pickadate.js-3.5.6/legacy.js"/>
+
 	</head>
-	<body>
+
+<body>
 		<a href="#list-game" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
 		<div class="nav" role="navigation">
 			<ul>
@@ -26,21 +30,33 @@
 				<div class="message" role="status">${flash.message}</div>
 			</g:if>
 
-			<g:form action="statistics" class="filter">
-				<div class="fieldcontain">
-					<label for="group">
-						<g:message code="default.statistics.filter.group.label" default="Gruppe" />:
-					</label>
-					<g:select id="filterByGroup" name="filterGroup" from="${SkatGroup.all}" noSelection="['':'Kein Filter']" value="${filterGroup}" optionKey="id"/>
-				</div>
-				<div class="fieldcontain">
-					<label for="period">
-						<g:message code="default.statistics.filter.period.label" default="Zeitraum" />:
-					</label>
-					<g:select valueMessagePrefix="default.statistics.filter.period" id="filterByPeriod" name="filterPeriod" from="${['week', 'month', 'year']}" noSelection="['':'Kein Filter']" value="${filterPeriod}" />
-				</div>
-			</g:form>
+            <g:form action="statistics" class="filter">
 
+				<fieldset>
+						<label for="filterByGroup"> Gruppe:</label>
+						<g:select id="filterByGroup" name="filterGroup" from="${SkatGroup.all}"
+									  noSelection="['': 'Kein Filter']" value="${filterGroup}" optionKey="id"/>
+				</fieldset>
+
+				<fieldset>
+					   <label for="from">Zeitraum von:</label>
+                        <input type="text" name="filterFrom"  id="from" class="datepicker" value="${filterPeriodFrom}" >
+				</fieldset>
+
+				<fieldset>
+					   <label for="to">bis:</label>
+                       <input type="text" name="filterTo"  id="to" class="datepicker" value="${filterPeriodTo}" >
+				</fieldset>
+
+
+
+			</g:form>
+            <g:if test="${!showChart}">
+                <div style="text-align: center">
+                    <h1 style="color: red">Keine Spiele im angegebenen Zeitraum gefunden</h1>
+                </div>
+            </g:if>
+            <g:if test="${showChart}">
 			<table>
 				<thead>
 					<tr>
@@ -69,10 +85,11 @@
 			
 			<div id="dateChart" style="min-width: 400px; height: 450px; margin: 0 auto">
 			</div>
+            </g:if>
 		</div>
 	</body>
 </html>
-
+<g:if test="${showChart}">
 <g:javascript>
 $(function () {
 	$(document).ready(function() {
@@ -116,7 +133,7 @@ $(function () {
 			name: '${series.player.name}',
 			data: ${series.data},
 			pointStart: ${series.pointStart},
-            pointInterval: ${series.pointInterval}
+            pointInterval: 3600 * 1000,      %{--//${series.pointInterval}--}%
 		});
 		</g:each>
 		new Highcharts.Chart(dateChart);
@@ -173,4 +190,17 @@ $(function () {
 	}
 });
 
+
+</g:javascript>
+</g:if>
+<g:javascript>
+	window.onload = function () {
+		var options = {format: 'yyyy-mm-dd',
+			onClose: function () {
+				jQuery("form.filter").submit();
+            }};
+		jQuery("[name=filterFrom]").pickadate(options)
+		jQuery("[name=filterTo]").pickadate(options)
+
+	};
 </g:javascript>
