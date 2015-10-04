@@ -31,22 +31,9 @@
 				</g:if>
 				</div>
 			</g:if>
-
 			<g:form action="importGames">
 				<fieldset class="form">
-					<div class="fieldcontain">
-						<label for="group">
-							<g:message code="game.group.label" default="Group" />
-						</label>
-						<g:select id="group" name="group.id" from="${skatdb.SkatGroup.list()}" optionKey="id" required="" value="${gameInstance?.group?.id}" class="many-to-one"/>
-					</div>
-					<div class="fieldcontain">
-						<label for="fakeDate">
-							<g:message code="game.import.fakeDate.label" default="Fake date" />
-						</label>
-						<g:checkBox id="fakeDateBox" name="useFakeDate" checked="false"/>
-						<g:datePicker id="fakeDatePicker" name="fakeDate" disabled="disabled" precision="day" />
-					</div>
+				    <p>Insert games in JSON format or insert an URL where the games can be found</p>
 					<div class="fieldcontain required">
 						<label for="importArea">
 							<g:message code="game.import.label" default="Import" />
