@@ -42,17 +42,18 @@ class GameController {
         log.info "From: " + params.filterFrom
         log.info "To: " + params.filterTo
 
-
-
         def filterPeriodFrom = stringtodate(params.filterFrom)
         def filterPeriodTo = stringtodate(params.filterTo)
 
         if (filterPeriodTo != null) {
             filterPeriodTo = new Date(filterPeriodTo.getTime() + MILLISECONDS_OF_A_DAY)
-            // erhöht filterPeriodTo um einen Tag um die Speile des ausgewählten Tages anzuzeigen
+            // erhöht filterPeriodTo um einen Tag um die Spiele des ausgewählten Tages anzuzeigen
         }
         Game firstGame = getFirstGame(group,filterPeriodFrom)
         Game lastGame = getLastGame(group, filterPeriodTo)
+		if(firstGame == null && lastGame == null) {
+			return;
+		}
         if (filterPeriodFrom == null) {
             filterPeriodFrom = firstGame.createDate
         }
@@ -62,7 +63,7 @@ class GameController {
 
         // get data
         def playerList = Player.all
-        def playerInfoList = getPlayerInfo(playerList, group, filterPeriodFrom, filterPeriodTo)
+        def playerInfoList = RenderUtils.getPlayerInfo(playerList, group, filterPeriodFrom, filterPeriodTo, false)
         def gameChart = getGameChart(playerList, group, filterPeriodFrom, filterPeriodTo)
         def dateChart = getDateChart(playerList, group, filterPeriodFrom, filterPeriodTo)
         [
@@ -101,37 +102,6 @@ class GameController {
 
         return timeStamp
 
-    }
-
-
-    private ArrayList getPlayerInfo(List<Player> playerList, SkatGroup group, Date filterDateFrom, Date filterDateTo) {
-
-
-        def playerInfoList = [];
-        for (Player p : playerList) {
-            List<Game> games = null
-            int won = 0
-            if (filterDateFrom == null && filterDateTo == null) {
-                games = group == null ? Game.findAllByPlayer(p) : Game.findAllByPlayerAndGroup(p, group);
-                won = group == null ? Game.countByPlayerAndWon(p, true) : Game.countByPlayerAndGroupAndWon(p, group, true)
-            } else {
-                games = group == null ? Game.findAllByPlayerAndCreateDateBetween(p, filterDateFrom, filterDateTo) :
-                        Game.findAllByPlayerAndGroupAndCreateDateBetween(p, group, filterDateFrom, filterDateTo)
-                won = group == null ? Game.countByPlayerAndWonAndCreateDateBetween(p, true, filterDateFrom, filterDateTo) :
-                        Game.countByPlayerAndGroupAndWonAndCreateDateBetween(p, group, true, filterDateFrom, filterDateTo)
-
-                log.info "Gefundene Spiele: " + games.size()
-            }
-            if (games.size() > 0) {
-                playerInfoList.push([
-                        player: p,
-                        count : games.size(),
-                        won   : won,
-                        points: games.sum { it.value }
-                ])
-            }
-        }
-        return playerInfoList
     }
 
     private ArrayList getGameChart(playerList, SkatGroup group, Date filterDateFrom, Date filterDateTo) {

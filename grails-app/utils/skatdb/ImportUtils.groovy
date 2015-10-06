@@ -60,37 +60,15 @@ abstract class ImportUtils {
 		}
 	}
 
-	public static ArrayList<String> doJSONImport(String json) {
+	public static ArrayList<String> doJSONImport(String json, closure) {
 		def errorList = []
 		JsonSlurper slurper = new JsonSlurper()
 		def result = slurper.parseText(json)
-		final def closure = {
-			for(Object jsonGame in result) {
-				try {
-					Game game = new Game()
-					game.group = findOrCreateGroup(jsonGame.group)
-					game.player = findOrCreatePlayer(jsonGame.player)
-					game.bid = jsonGame.bid  != null ? jsonGame.bid : 18
-					game.gameType = jsonGame.gameType != null ? jsonGame.gameType : 9
-					game.hand = jsonGame.hand != null ? jsonGame.hand : false
-					game.gameLevel = jsonGame.gameLevel != null ? jsonGame.gameLevel : 1
-					// ramsch uses jacks as value
-					game.jacks =  jsonGame.bid == null || jsonGame.bid != 0 ? (jsonGame.jacks != null ? jsonGame.jacks : 1) : (jsonGame.value  / jsonGame.gameLevel)
-					game.announcement = jsonGame.announcement != null ? jsonGame.announcement : 1
-					game.won = jsonGame.won != null ? jsonGame.won : true
-					game.createDate = jsonGame.createDate != null ? new Date(jsonGame.createDate) : new Date()
-					game.modifyDate = jsonGame.modifyDate != null ? new Date(jsonGame.modifyDate) : new Date()
-					game.save()
-				} catch(Exception exc) {
-					Logger.getLogger(this).error("while parsing json object: " + jsonGame, exc)
-					errorList.push(jsonGame)
-				}
-			}
-		}
+		// TODO: don't use Game class here, use more general one
 		Game.withNewSession { session ->
 			Transaction tr = session.beginTransaction()
 			try {
-				closure()
+				closure(result)
 				tr.commit()
 			} catch(Throwable t) {
 				tr.rollback()
@@ -98,6 +76,88 @@ abstract class ImportUtils {
 			}
 		};
 		return errorList
+	}
+
+	public static ArrayList<String> doJSONImport(String json) {
+		return doJSONImport(json, { result ->
+			for(Object o in result) {
+				try {
+					if(o.group != null && o.player != null) {
+						Game game = handleGame(o, null)
+						game.save()
+					} else if(o.gamesPerRound != null) {
+						handleTournament(o)
+					}
+				} catch(Exception exc) {
+					Logger.getLogger(this).error("while parsing json object: " + o, exc)
+					errorList.push(o)
+				}
+			}
+		})
+	}
+
+	public static Game handleGame(json, group) {
+		Game game = new Game()
+		game.group = group != null ? group : findOrCreateGroup(json.group)
+		game.player = findOrCreatePlayer(json.player)
+		game.bid = json.bid  != null ? json.bid : 18
+		game.gameType = json.gameType != null ? json.gameType : 9
+		game.hand = json.hand != null ? json.hand : false
+		game.gameLevel = json.gameLevel != null ? json.gameLevel : 1
+		// ramsch uses jacks as value
+		game.jacks =  json.bid == null || json.bid != 0 ? (json.jacks != null ? json.jacks : 1) : (json.value  / json.gameLevel)
+		game.announcement = json.announcement != null ? json.announcement : 1
+		game.won = json.won != null ? json.won : true
+		game.createDate = json.createDate != null ? new Date(json.createDate) : new Date()
+		game.modifyDate = json.modifyDate != null ? new Date(json.modifyDate) : new Date()
+		return game
+	}
+
+	public static void handleTournament(json) {
+		Tournament t = Tournament.create();
+		t.name = json.name;
+		t.status = Integer.valueOf(json.status);
+		t.gamesPerRound = Integer.valueOf(json.gamesPerRound);
+		t.rounds = new ArrayList<TournamentRound>();
+		t.players = new HashSet<Player>()
+
+		// rounds
+		if(json.rounds != null) {
+			for(Object round in json.rounds) {
+				TournamentRound r = TournamentRound.create();
+				r.tournament = t
+				r.groups = new ArrayList<TournamentGroup>()
+				// groups
+				if(round.groups != null) {
+					for(Object group in round.groups) {
+						TournamentGroup g = TournamentGroup.create();
+						g.tournament = t;
+						g.round = r;
+						g.players = new HashSet<Player>()
+						g.games = new HashSet<Game>()
+						// players
+						if(group.players != null) {
+							for(String player in group.players) {
+								Player p = findOrCreatePlayer(player);
+								g.players.add(p)
+								t.players.add(p)
+							}
+						}
+						// games
+						if(group.games != null) {
+							for(Object jsonGame in group.games) {
+								Game game = handleGame(jsonGame, t)
+								game.importMode = true
+								g.games.add(game)
+							}
+						}
+						r.groups.add(g);
+					}
+				}
+				t.rounds.add(Integer.valueOf(round.index), r)
+			}
+		}
+		t.save()
 	}
 
 	public static SkatGroup findOrCreateGroup(String name) {

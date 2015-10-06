@@ -3,7 +3,6 @@ package skatdb
 import groovy.json.JsonSlurper
 import grails.plugins.springsecurity.Secured
 
-@Secured(['ROLE_ADMIN'])
 class JSONController {
 
 	def index() {
@@ -101,30 +100,86 @@ class JSONController {
 		}
 	}
 
+	def tournaments() {
+		response.setHeader("Access-Control-Allow-Origin", "*")
+		if(request.method == 'GET') {
+			List<Tournament> tournamentList = Tournament.all
+			ArrayList<Map> tournamentArray = new ArrayList<>();
+			for(Tournament t : tournamentList) {
+				Map tournamentJSON = new LinkedHashMap<String, Object>();
+				tournamentJSON.put("name", t.name);
+				tournamentJSON.put("status", t.status);
+				tournamentJSON.put("gamesPerRound", t.gamesPerRound);
+				// rounds
+				List<Map> roundsArray = new ArrayList<>();
+				for(TournamentRound r : t.rounds) {
+					Map roundsJSON = new LinkedHashMap<String, Object>();
+					roundsJSON.put("index", t.rounds.indexOf(r));
+					// groups
+					List<Map> groupsArray = new ArrayList<>();
+					for(TournamentGroup g : r.groups) {
+						Map groupsJSON = new LinkedHashMap<String, Object>();
+						// players
+						List<String> players = new ArrayList<>();
+						for(Player p : g.players) {
+							players.add(p.name)
+						}
+						groupsJSON.put("players", players)
+						// games
+						List<String> games = new ArrayList<>();
+						for(Game game : g.games) {
+							games.add(getGame(game))
+						}
+						groupsJSON.put("games", games)
+						groupsArray.add(groupsJSON);
+					}
+					roundsJSON.put("groups", groupsArray)
+					roundsArray.add(roundsJSON);
+				}
+				tournamentJSON.put("rounds", roundsArray);
+				tournamentArray.add(tournamentJSON);
+			}
+			render(contentType: "text/json") {
+				if(!tournamentArray.empty) {
+					tournamentArray
+				} else {[]}
+			}
+		}
+	}
+
+	def Map getGame(Game g) {
+		Map game = new LinkedHashMap<String, Object>();
+		game.put("group", g.group.name);
+		game.put("player", g.player.name);
+		game.put("bid", g.bid);
+		game.put("jacks", g.jacks);
+		game.put("gameType", g.gameType);
+		game.put("hand", g.hand);
+		game.put("gameLevel", g.gameLevel);
+		game.put("announcement", g.announcement);
+		game.put("won", g.won);
+		game.put("value", g.value);
+		game.put("createDate", g.createDate.time);
+		game.put("modifyDate", g.modifyDate.time);
+		return game
+	}
+
 	def games() {
 		response.setHeader("Access-Control-Allow-Origin", "*")
 		if(request.method == 'GET') {
 			List<Game> results = Game.all
+			
+			ArrayList<Map> games = new ArrayList<Map>();
+			for (g in results) {
+				if(g.group instanceof Tournament) {
+					// don't export tournament games
+					continue;
+				}
+				games.add(getGame(g));
+			}
 			render(contentType: "text/json") {
 				if(!results.empty) {
-					array {
-						for (g in results) {
-							game(
-									group: g.group.name,
-									player: g.player.name,
-									bid: g.bid,
-									jacks: g.jacks,
-									gameType: g.gameType,
-									hand: g.hand,
-									gameLevel: g.gameLevel,
-									announcement: g.announcement,
-									won: g.won,
-									value: g.value,
-									createDate: g.createDate.time,
-									modifyDate: g.modifyDate.time
-									)
-						}
-					}
+					games
 				} else {[]}
 			}
 		} else if(request.method == 'POST') {

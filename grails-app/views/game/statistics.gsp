@@ -31,7 +31,6 @@
 			</g:if>
 
             <g:form action="statistics" class="filter">
-
 				<fieldset>
 						<label for="filterByGroup"> Gruppe:</label>
 						<g:select id="filterByGroup" name="filterGroup" from="${SkatGroup.all}"
@@ -47,9 +46,6 @@
 					   <label for="to">bis:</label>
                        <input type="text" name="filterTo"  id="to" class="datepicker" value="${filterPeriodTo}" >
 				</fieldset>
-
-
-
 			</g:form>
             <g:if test="${!showChart}">
                 <div style="text-align: center">
@@ -57,34 +53,11 @@
                 </div>
             </g:if>
             <g:if test="${showChart}">
-			<table>
-				<thead>
-					<tr>
-						<th><g:message code="game.player.label" default="Spieler" /></th>
-						<th><g:message code="game.games.label" default="Anzahl Spiele" /></th>
-						<th><g:message code="game.wonlost.label" default="Gewonnen/Verloren" /></th>
-						<th><g:message code="game.points.label" default="Punkte" /></th>
-					</tr>
-				</thead>
-				<tbody>
-					<g:each in="${gameStatisticsList}" status="i" var="gameStatistics">
-						<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-							<td><g:link controller="player" action="show" id="${gameStatistics.player.id}">${gameStatistics.player.name}</g:link></td>
-							<td>${gameStatistics.count}</td>
-							<g:set var="lost" value="${gameStatistics.count != 0 ? gameStatistics.count-gameStatistics.won : 0}"></g:set>
-							<g:set var="ratio" value="${lost != 0 ? gameStatistics.won/lost : 0}"></g:set>
-							<td>${gameStatistics.won}/${lost} (<g:formatNumber number="${ratio}" format="0.00" />)</td>
-							<td>${gameStatistics.points}</td>
-						</tr>
-					</g:each>
-				</tbody>
-			</table>
-
-			<div id="gameChart" style="min-width: 400px; height: 450px; margin: 0 auto">
-			</div>
-			
-			<div id="dateChart" style="min-width: 400px; height: 450px; margin: 0 auto">
-			</div>
+	            <g:render template="/util/PlayerTable" bean="${gameStatisticsList}" />
+				<div id="gameChart" style="min-width: 400px; height: 450px; margin: 0 auto">
+				</div>
+				<div id="dateChart" style="min-width: 400px; height: 450px; margin: 0 auto">
+				</div>
             </g:if>
 		</div>
 	</body>

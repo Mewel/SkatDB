@@ -100,6 +100,9 @@
 						<g:link controller="SkatGroup">Skatrunden verwalten</g:link>
 					</li>
 					<li class="controller">
+						<g:link controller="Tournament">Turniere verwalten</g:link>
+					</li>
+					<li class="controller">
 						<g:link controller="ImportExport">Import/Export</g:link>
 					</li>
 				</ul>

@@ -64,6 +64,8 @@ class Game {
 
 	Date modifyDate = new Date()
 
+	transient boolean importMode = false
+
 	static constraints = {
 		group()
 		player()
@@ -89,11 +91,19 @@ class Game {
 		value = calcValue()
 	}
 
+	def afterInsert() {
+		if(importMode) {
+			return;
+		}
+		if(group instanceof Tournament) {
+			group.addGame(this)
+		}
+	}
+
 	int calcValue() {
 		int newValue = 0
-		// ramsch -> we use the jacks as value
 		if(bid == 0) {
-			// new game
+			// ramsch -> we use the jacks as value
 			newValue = jacks * gameLevel;
 			won = gameLevel > 0;
 			jacks = 1;
@@ -108,6 +118,10 @@ class Game {
 			if(!won) {
 				newValue = newValue * -2;
 			}
+		}
+		// tournament
+		if(group instanceof Tournament) {
+			newValue += won ? 50 : -100
 		}
 		return newValue;
 	}

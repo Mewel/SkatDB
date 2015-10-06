@@ -44,8 +44,8 @@ class ImportExportController {
 	}
 
 	private String readFromURL(String url) {
-		URL oracle = new URL(url);
-		URLConnection yc = oracle.openConnection();
+		URL u = new URL(url);
+		URLConnection yc = u.openConnection();
 		BufferedReader br = new BufferedReader(new InputStreamReader(yc.getInputStream()));
 		StringBuffer b = new StringBuffer();
 		String inputLine;
