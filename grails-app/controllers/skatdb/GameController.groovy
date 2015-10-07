@@ -42,8 +42,8 @@ class GameController {
         log.info "From: " + params.filterFrom
         log.info "To: " + params.filterTo
 
-        def filterPeriodFrom = stringtodate(params.filterFrom)
-        def filterPeriodTo = stringtodate(params.filterTo)
+        def filterPeriodFrom = params.filterFrom
+        def filterPeriodTo = params.filterTo
 
         if (filterPeriodTo != null) {
             filterPeriodTo = new Date(filterPeriodTo.getTime() + MILLISECONDS_OF_A_DAY)
@@ -73,8 +73,8 @@ class GameController {
                 filterGroup       : group == null ? "" : group.id,
                 filterPeriod      : params.filterPeriod,
                 showChart         : !gameChart.empty,
-                filterPeriodFrom  : datetoString(filterPeriodFrom),
-                filterPeriodTo    : datetoString(new Date(filterPeriodTo.getTime() - MILLISECONDS_OF_A_DAY))
+                filterPeriodFrom  : filterPeriodFrom,
+                filterPeriodTo    : new Date(filterPeriodTo.getTime() - MILLISECONDS_OF_A_DAY)
         ]
     }
 
@@ -142,8 +142,8 @@ class GameController {
 			return chart
 		}
 		Game lastGame = getLastGame(group, filterDateTo)
-		Date date = maxDate(firstGame.createDate, filterDateFrom)
-		Date lastDate = minDate(lastGame.createDate, filterDateTo)
+		Date date = maxDate(firstGame != null ? firstGame.createDate : null, filterDateFrom)
+		Date lastDate = minDate(lastGame != null ? lastGame.createDate : new Date(), filterDateTo)
 		while(date < lastDate) {
 			for(Object series : chart) {
 				series.data.push(series.data[series.data.size() - 1]);

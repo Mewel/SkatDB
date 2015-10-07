@@ -3,17 +3,13 @@
 <%@ page import="skatdb.Game" %>
 <!doctype html>
 
-	<head>
-		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'game.label', default: 'Game')}" />
-		<title><g:message code="default.list.label" args="[entityName]" /></title>
-		<g:javascript src="highcharts/highcharts.js" />
-		<g:javascript src="highcharts/modules/exporting.js" />
-        <g:javascript src="pickadate.js-3.5.6/picker.js"/>
-        <g:javascript src="pickadate.js-3.5.6/picker.date.js"/>
-        <g:javascript src="pickadate.js-3.5.6/legacy.js"/>
-
-	</head>
+<head>
+	<meta name="layout" content="main">
+	<g:set var="entityName" value="${message(code: 'game.label', default: 'Game')}" />
+	<title><g:message code="default.list.label" args="[entityName]" /></title>
+	<g:javascript src="highcharts/highcharts.js" />
+	<g:javascript src="highcharts/modules/exporting.js" />
+</head>
 
 <body>
 		<a href="#list-game" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
@@ -34,18 +30,19 @@
 				<fieldset>
 						<label for="filterByGroup"> Gruppe:</label>
 						<g:select id="filterByGroup" name="filterGroup" from="${SkatGroup.all}"
-									  noSelection="['': 'Kein Filter']" value="${filterGroup}" optionKey="id"/>
+									  noSelection="['': 'Kein Filter']" value="${filterGroup}" optionKey="id" />
 				</fieldset>
 
 				<fieldset>
 					   <label for="from">Zeitraum von:</label>
-                        <input type="text" name="filterFrom"  id="from" class="datepicker" value="${filterPeriodFrom}" >
+					   <g:datePicker name="filterFrom"  id="from" class="datepicker" value="${filterPeriodFrom}" precision="day"  />
 				</fieldset>
 
 				<fieldset>
 					   <label for="to">bis:</label>
-                       <input type="text" name="filterTo"  id="to" class="datepicker" value="${filterPeriodTo}" >
+                       <g:datePicker name="filterTo"  id="to" class="datepicker" value="${filterPeriodTo}"  precision="day" />
 				</fieldset>
+				<g:submitButton name="Filter anwenden" />
 			</g:form>
             <g:if test="${!showChart}">
                 <div style="text-align: center">
@@ -67,9 +64,6 @@
 $(function () {
 	$(document).ready(function() {
 		loadCharts();
-		$('#filterByGroup,#filterByPeriod').change(function() {
-			$('form:first').submit();
-		});
 	});
 
 	function loadCharts() {
@@ -166,14 +160,3 @@ $(function () {
 
 </g:javascript>
 </g:if>
-<g:javascript>
-	window.onload = function () {
-		var options = {format: 'yyyy-mm-dd',
-			onClose: function () {
-				jQuery("form.filter").submit();
-            }};
-		jQuery("[name=filterFrom]").pickadate(options)
-		jQuery("[name=filterTo]").pickadate(options)
-
-	};
-</g:javascript>
