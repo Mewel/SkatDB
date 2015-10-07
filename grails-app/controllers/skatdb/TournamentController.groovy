@@ -48,7 +48,7 @@ class TournamentController {
 	def finishTournament() {
 		setStatus(2)
 	}
-	
+
 	def newRound() {
 		Tournament tournament = Tournament.findById(params.id)
 		if(tournament == null) {
@@ -86,6 +86,30 @@ class TournamentController {
 		redirect(action: "show", id: params.id)
 	}
 
+	def deleteRound() {
+		TournamentRound round = TournamentRound.findById(params.id)
+		if(round == null) {
+			return response.sendError(404, "TournamentRound with id " + params.id + " not found.")
+		}
+		deleteTournamentRound(round)
+		redirect(action: "show", id: round.tournament.id)
+	}
+
+	/**
+	 * Deletes a whole round including all groups and all games played.
+	 * 
+	 * @param round to delete
+	 */
+	private void deleteTournamentRound(TournamentRound round) {
+		for(TournamentGroup group : round.groups) {
+			for(Game game : group.games) {
+				game.delete()
+			}
+			group.delete()
+		}
+		round.delete()
+	}
+	
 	/**
 	 * Create groups and add them to the round.
 	 * 

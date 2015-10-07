@@ -76,7 +76,14 @@
 					<g:each in="${tournamentInstance.rounds}" var="round" status="r">
 					    <div class="panel panel-default">
                           <div class="panel-heading">
-                            <h3 class="panel-title"><b>Runde ${r + 1}</b></h3>
+                            <h3 class="panel-title">
+                            	<b>Runde ${r + 1}</b>
+                            	<span class="pull-right">
+                            		<a href="javascript:void(0)" onclick="confirm('Gruppe wirklich löschen?') ? document.location.href = '${createLink(controller: 'tournament', action: 'deleteRound', id: round?.id) }' : null">
+                            			<span aria-hidden="true" class="glyphicon glyphicon-remove" style="color: gray"></span>
+                            		</a>
+                            	</span>
+                            </h3>
                           </div>
                           <div class="panel-body">
                             <g:each in="${round.groups}" var="group" status="g">
