@@ -136,31 +136,35 @@ class GameController {
 
     private ArrayList getDateChart(playerList, SkatGroup group, Date filterDateFrom, Date filterDateTo) {
         def chart = []
-        int dayRange = 1
-
-        if (filterDateFrom != null && filterDateTo != null) {
-            while (filterDateFrom.getTime() < filterDateTo.getTime()) {
-                for (Object series : chart) {
-                    series.data.push(series.data[series.data.size() -1]);
-                }
-                List<Game> games = null;
-                if (group == null) {
-                    games = Game.findAll("from Game as g where g.createDate >= ? and g.createDate < ?", [filterDateFrom, filterDateFrom.plus(dayRange)])
-                } else {
-                    games = Game.findAll("from Game as g where g.createDate >= ? and g.createDate < ? and g.group = ?", [filterDateFrom, filterDateFrom.plus(dayRange), group])
-                }
-                for (Game g : games) {
-                    def series = getSeries(g.player, chart)
-                    if (series == null) {
-                        series = createSeries(g.player, filterDateFrom, dayRange)
-                        chart.push(series)
-                    }
-                    series.data[series.data.size() -1] += g.value
-                }
-                filterDateFrom = filterDateFrom.plus(dayRange)
-            }
-        }
-        return chart
+		int dayRange = 1
+		Game firstGame = getFirstGame(group, filterDateFrom)
+		if(firstGame == null) {
+			return chart
+		}
+		Game lastGame = getLastGame(group, filterDateTo)
+		Date date = maxDate(firstGame.createDate, filterDateFrom)
+		Date lastDate = minDate(lastGame.createDate, filterDateTo)
+		while(date < lastDate) {
+			for(Object series : chart) {
+				series.data.push(series.data[series.data.size() - 1]);
+			}
+			List<Game> games = null;
+			if(group == null) {
+				games = Game.findAll("from Game as g where g.createDate >= ? and g.createDate < ?", [date, date.plus(dayRange)])
+			} else {
+				games = Game.findAll("from Game as g where g.createDate >= ? and g.createDate < ? and g.group = ?", [date, date.plus(dayRange), group])
+			}
+			for(Game g : games) {
+				def series = getSeries(g.player, chart)
+				if(series == null) {
+					series = createSeries(g.player, date, dayRange)
+					chart.push(series)
+				}
+				series.data[series.data.size() - 1] += g.value
+			}
+			date = date.plus(dayRange);
+		}
+		return chart
     }
 
     private Game getFirstGame(SkatGroup group, Date filterDateFrom) {
@@ -177,7 +181,7 @@ class GameController {
 
     private Game getLastGame(SkatGroup group, Date filterDateTo) {
         if (filterDateTo != null && group != null) {
-            return Game.find("from Game as g where g.group = ? and g.createDate <=? ORDER BY createDate desc", [group, filterDateTo])
+            return Game.find("from Game as g where g.group = ? and g.createDate <= ? ORDER BY createDate desc", [group, filterDateTo])
         } else if (group != null) {
             return Game.find("from Game as g where g.group = ? ORDER BY createDate desc", [group])
         } else {
@@ -204,4 +208,29 @@ class GameController {
         return null
     }
 
+	private Date maxDate(Date d1, Date d2) {
+		if(d1 == null && d2 == null) {
+			return null
+		}
+		if(d1 == null) {
+			return d2
+		}
+		if(d2 == null) {
+			return d1
+		}
+		return new Date(Math.max(d1.time, d2.time))
+	}
+	
+	private Date minDate(Date d1, Date d2) {
+		if(d1 == null && d2 == null) {
+			return null
+		}
+		if(d1 == null) {
+			return d2
+		}
+		if(d2 == null) {
+			return d1
+		}
+		return new Date(Math.min(d1.time, d2.time))
+	}
 }

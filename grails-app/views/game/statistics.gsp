@@ -106,7 +106,7 @@ $(function () {
 			name: '${series.player.name}',
 			data: ${series.data},
 			pointStart: ${series.pointStart},
-            pointInterval: 3600 * 1000,      %{--//${series.pointInterval}--}%
+            pointInterval: ${series.pointInterval}
 		});
 		</g:each>
 		new Highcharts.Chart(dateChart);
