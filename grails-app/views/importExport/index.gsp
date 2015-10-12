@@ -12,7 +12,8 @@
 		<div class="nav" role="navigation">
 			<ul>
 				<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-				<li><g:link class="export" controller="JSON" action="games"><g:message code="export.label" /></g:link></li>
+				<li><g:link class="export" controller="JSON" action="games">Export Games</g:link></li>
+				<li><g:link class="export" controller="JSON" action="tournaments">Export Tournaments</g:link></li>
 			</ul>
 		</div>
 		<div id="import-game" class="content scaffold-import" role="main">
@@ -33,7 +34,9 @@
 			</g:if>
 			<g:form action="importGames">
 				<fieldset class="form">
-				    <p>Insert games in JSON format or insert an URL where the games can be found</p>
+				    <p>You can add games or tournaments here. The supported input format is <b>JSON</b>.
+				    You can drop it directly into the text area, or you can specify an URL where the
+				    importer can find the data.</p>
 					<div class="fieldcontain required">
 						<label for="importArea">
 							<g:message code="game.import.label" default="Import" />
