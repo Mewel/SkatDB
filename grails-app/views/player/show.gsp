@@ -94,6 +94,17 @@
 						<td>${nullGamesLost}</td>
 						<td><g:formatNumber number="${nullGamesWinPercent}" format="0.00" />%</td>
 					</tr>
+					<tr>
+						<g:set var="ramschGamesLost" value="${ramschGames != 0 ? ramschGames-ramschGamesWon : 0}"></g:set>
+						<g:set var="ramschGamesPercent" value="${ramschGames != 0 ? (ramschGames/games * 100) : 0}"></g:set>
+						<g:set var="ramschGamesWinPercent" value="${ramschGames != 0 ? (ramschGamesWon/ramschGames * 100) : 0}"></g:set>
+						<td><b>Ramsch</b></td>
+						<td>${ramschGames}</td>
+						<td><g:formatNumber number="${ramschGamesPercent}" format="0.00" />%</td>
+						<td>${ramschGamesWon}</td>
+						<td>${ramschGamesLost}</td>
+						<td><g:formatNumber number="${ramschGamesWinPercent}" format="0.00" />%</td>
+					</tr>
 				</table>
 				<h2>Sonstiges</h2>
 				<div>längste Siegesserie: ${wonSeries}</div>

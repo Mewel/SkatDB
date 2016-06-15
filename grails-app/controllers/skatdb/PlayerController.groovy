@@ -82,13 +82,15 @@ class PlayerController {
 		[
 			playerInstance: player,
 			games: Game.countByPlayer(player),
-			suitGames: Game.countByPlayerAndGameTypeBetween(player, 9, 12),
+			suitGames: Game.countByPlayerAndGameTypeBetweenAndBidNotEqual(player, 9, 12, 0),
 			grands: Game.countByPlayerAndGameType(player, 24),
 			nullGames: Game.countByPlayerAndGameTypeInList(player, [23, 35, 46, 59]),
 			gamesWon: Game.countByPlayerAndWon(player, true),
-			suitGamesWon: Game.countByPlayerAndGameTypeBetweenAndWon(player, 9, 12, true),
+			suitGamesWon: Game.countByPlayerAndGameTypeBetweenAndWonAndBidNotEqual(player, 9, 12, true, 0),
 			grandsWon: Game.countByPlayerAndGameTypeAndWon(player, 24, true),
 			nullGamesWon: Game.countByPlayerAndGameTypeInListAndWon(player, [23, 35, 46, 59], true),
+			ramschGames: Game.countByPlayerAndBid(player, 0),
+			ramschGamesWon: Game.countByPlayerAndBidAndWon(player, 0, true),
 
 			wonSeries: longestWon,
 			lostSeries: longestLost,
