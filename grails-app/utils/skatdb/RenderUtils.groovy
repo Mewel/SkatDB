@@ -15,7 +15,28 @@ public abstract class RenderUtils {
 		}
 		return gamesPerRound
 	}
-	
+
+	public static Map getGameStatistics(Player player, SkatGroup group, Date filterPeriodFrom, Date filterPeriodTo) {
+		def query = Game.where {
+			(player != null ? player == player : player != null) &&
+			(group != null ? group == group : group != null) &&
+			(filterPeriodFrom != null ? createDate >= filterPeriodFrom : createDate != null) &&
+			(filterPeriodTo != null ? createDate <= filterPeriodTo : createDate != null)
+		}
+		[
+			games: query.count(),
+			suitGames: query.countByGameTypeBetweenAndBidNotEqual(9, 12, 0),
+			grands: query.countByGameType(24),
+			nullGames: query.countByGameTypeInList([23, 35, 46, 59]),
+			gamesWon: query.countByWon(true),
+			suitGamesWon: query.countByGameTypeBetweenAndWonAndBidNotEqual(9, 12, true, 0),
+			grandsWon: query.countByGameTypeAndWon(24, true),
+			nullGamesWon: query.countByGameTypeInListAndWon([23, 35, 46, 59], true),
+			ramschGames: query.countByBid(0),
+			ramschGamesWon: query.countByBidAndWon(0, true)
+		]
+	}
+
 	public static ArrayList getPlayerInfo(List<Player> playerList, SkatGroup group, Date filterDateFrom, Date filterDateTo, boolean showZeroGames) {
 		def playerInfoList = [];
 		for (Player p : playerList) {

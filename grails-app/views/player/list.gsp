@@ -23,17 +23,13 @@
 			<table>
 				<thead>
 					<tr>
-					
 						<g:sortableColumn property="name" title="${message(code: 'player.name.label', default: 'Name')}" />
-					
 					</tr>
 				</thead>
 				<tbody>
 				<g:each in="${playerInstanceList}" status="i" var="playerInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
-					
 						<td><g:link action="show" id="${playerInstance.id}">${fieldValue(bean: playerInstance, field: "name")}</g:link></td>
-					
 					</tr>
 				</g:each>
 				</tbody>

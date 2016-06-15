@@ -50,7 +50,8 @@
                 </div>
             </g:if>
             <g:if test="${showChart}">
-	            <g:render template="/util/PlayerTable" bean="${gameStatisticsList}" />
+				<g:render template="/util/PlayerTable" bean="${playerTable}" />
+				<g:render template="/util/StatisticTable" bean="${gameStatistics}" />
 				<div id="gameChart" style="min-width: 400px; height: 450px; margin: 0 auto">
 				</div>
 				<div id="dateChart" style="min-width: 400px; height: 450px; margin: 0 auto">

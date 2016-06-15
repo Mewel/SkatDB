@@ -42,70 +42,7 @@
 			</g:if>
 			<div class="contentdiv">
 				<h2>Spiele</h2>
-				<table>
-					<tr>
-						<th></th>
-						<th>Anzahl</th>
-						<th>Anteilig %</th>
-						<th>Gewonnen</th>
-						<th>Verloren</th>
-						<th>Gewonnen %</th>
-					</tr>
-					<tr>
-						<g:set var="gamesLost" value="${games != 0 ? games-gamesWon : 0}"></g:set>
-						<g:set var="gamesWinPercent" value="${gamesLost != 0 ? (gamesWon/(games) * 100) : 100}"></g:set>
-						<td><b>Spiele</b></td>
-						<td>${games}</td>
-						<td>100%</td>
-						<td>${gamesWon}</td>
-						<td>${gamesLost}</td>
-						<td><g:formatNumber number="${gamesWinPercent}" format="0.00" />%</td>
-					</tr>
-					<tr>
-						<g:set var="suitGamesLost" value="${suitGames != 0 ? suitGames-suitGamesWon : 0}"></g:set>
-						<g:set var="suitGamesPercent" value="${suitGames != 0 ? (suitGames/games * 100) : 0}"></g:set>
-						<g:set var="suitGamesWinPercent" value="${suitGames != 0 ? (suitGamesWon/suitGames * 100) : 0}"></g:set>
-						<td><b>Farbspiele</b></td>
-						<td>${suitGames}</td>
-						<td><g:formatNumber number="${suitGamesPercent}" format="0.00" />%</td>
-						<td>${suitGamesWon}</td>
-						<td>${suitGamesLost}</td>
-						<td><g:formatNumber number="${suitGamesWinPercent}" format="0.00" />%</td>
-					</tr>
-					<tr>
-						<g:set var="grandsLost" value="${grands != 0 ? grands-grandsWon : 0}"></g:set>
-						<g:set var="grandsPercent" value="${grands != 0 ? (grands/games * 100) : 0}"></g:set>
-						<g:set var="grandsWinPercent" value="${grands != 0 ? (grandsWon/grands * 100) : 0}"></g:set>
-						<td><b>Grands</b></td>
-						<td>${grands}</td>
-						<td><g:formatNumber number="${grandsPercent}" format="0.00" />%</td>
-						<td>${grandsWon}</td>
-						<td>${grandsLost}</td>
-						<td><g:formatNumber number="${grandsWinPercent}" format="0.00" />%</td>
-					</tr>
-					<tr>
-						<g:set var="nullGamesLost" value="${nullGames != 0 ? nullGames-nullGamesWon : 0}"></g:set>
-						<g:set var="nullGamesPercent" value="${nullGames != 0 ? (nullGames/games * 100) : 0}"></g:set>
-						<g:set var="nullGamesWinPercent" value="${nullGames != 0 ? (nullGamesWon/nullGames * 100) : 0}"></g:set>
-						<td><b>Nullspiele</b></td>
-						<td>${nullGames}</td>
-						<td><g:formatNumber number="${nullGamesPercent}" format="0.00" />%</td>
-						<td>${nullGamesWon}</td>
-						<td>${nullGamesLost}</td>
-						<td><g:formatNumber number="${nullGamesWinPercent}" format="0.00" />%</td>
-					</tr>
-					<tr>
-						<g:set var="ramschGamesLost" value="${ramschGames != 0 ? ramschGames-ramschGamesWon : 0}"></g:set>
-						<g:set var="ramschGamesPercent" value="${ramschGames != 0 ? (ramschGames/games * 100) : 0}"></g:set>
-						<g:set var="ramschGamesWinPercent" value="${ramschGames != 0 ? (ramschGamesWon/ramschGames * 100) : 0}"></g:set>
-						<td><b>Ramsch</b></td>
-						<td>${ramschGames}</td>
-						<td><g:formatNumber number="${ramschGamesPercent}" format="0.00" />%</td>
-						<td>${ramschGamesWon}</td>
-						<td>${ramschGamesLost}</td>
-						<td><g:formatNumber number="${ramschGamesWinPercent}" format="0.00" />%</td>
-					</tr>
-				</table>
+				<g:render template="/util/StatisticTable" bean="${gameStatistics}" /> 
 				<h2>Sonstiges</h2>
 				<div>längste Siegesserie: ${wonSeries}</div>
 				<div>längste Verlustserie: ${lostSeries}</div>

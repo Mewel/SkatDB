@@ -64,10 +64,12 @@ class GameController {
         // get data
         def playerList = Player.all
         def playerInfoList = RenderUtils.getPlayerInfo(playerList, group, filterPeriodFrom, filterPeriodTo, false)
+		def statisticTable = RenderUtils.getGameStatistics(null, group, filterPeriodFrom, filterPeriodTo)
         def gameChart = getGameChart(playerList, group, filterPeriodFrom, filterPeriodTo)
         def dateChart = getDateChart(playerList, group, filterPeriodFrom, filterPeriodTo)
         [
-                gameStatisticsList: playerInfoList,
+                playerTable       : playerInfoList,
+				gameStatistics    : statisticTable,
                 gameChart         : gameChart,
                 dateChart         : dateChart,
                 filterGroup       : group == null ? "" : group.id,
