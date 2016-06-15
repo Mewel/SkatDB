@@ -17,11 +17,26 @@ public abstract class RenderUtils {
 	}
 
 	public static Map getGameStatistics(Player player, SkatGroup group, Date filterPeriodFrom, Date filterPeriodTo) {
-		def query = Game.where {
-			(player != null ? player == player : player != null) &&
-			(group != null ? group == group : group != null) &&
-			(filterPeriodFrom != null ? createDate >= filterPeriodFrom : createDate != null) &&
-			(filterPeriodTo != null ? createDate <= filterPeriodTo : createDate != null)
+		def query = Game.where {}
+		if(player != null) {
+			query = query.where {
+				player == player
+			}
+		}
+		if(group != null) {
+			query = query.where {
+				group == group
+			}
+		}
+		if(filterPeriodFrom != null) {
+			query = query.where {
+				createDate >= filterPeriodFrom
+			}
+		}
+		if(filterPeriodTo != null) {
+			query = query.where {
+				createDate <= filterPeriodTo
+			}
 		}
 		[
 			games: query.count(),
